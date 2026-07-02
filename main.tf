@@ -38,71 +38,71 @@ resource "aws_ec2_instance_state" "main" {
   state       = "stopped"
   depends_on = [ terraform_data.main]
 }
-# resource "aws_ami_from_instance" "catalogue" {
-#   name               = "${local.common_name}-catalogue-${var.app_version}-${aws_instance.catalogue.id}"
-#   source_instance_id = aws_instance.catalogue.id
-#   depends_on = [ aws_ec2_instance_state.catalogue ]
-#   tags = merge(
-#     {
-#       Name = "${local.common_name}-catalogue-${var.app_version}-${aws_instance.catalogue.id}"
-#     },
-#     local.common_tags
-#   )
-# }
-# resource "aws_launch_template" "catalogue" {
-#   name = "${local.common_name}-catalogue"
-#   image_id = aws_ami_from_instance.catalogue.id
-#   instance_initiated_shutdown_behavior = "terminate"
-#   instance_type = "t3.micro"
-#   vpc_security_group_ids = [local.catalogue_sg_id]
-#   update_default_version = true
+resource "aws_ami_from_instance" "main" {
+  name               = "${local.common_name}-${var.app_version}-${aws_instance.main.id}"
+  source_instance_id = aws_instance.main.id
+  depends_on = [ aws_ec2_instance_state.main ]
+  tags = merge(
+    {
+      Name = "${local.common_name}-${var.app_version}-${aws_instance.main.id}"
+    },
+    local.common_tags
+  )
+}
+resource "aws_launch_template" "main" {
+  name = local.common_name
+  image_id = aws_ami_from_instance.main.id
+  instance_initiated_shutdown_behavior = "terminate"
+  instance_type = "t3.micro"
+  vpc_security_group_ids = [local.sg_id]
+  update_default_version = true
 
-#   tag_specifications {
-#     resource_type = "instance"
+  tag_specifications {
+    resource_type = "instance"
 
-#     tags = merge(
-#     {
-#       Name = "${local.common_name}-catalogue-${var.app_version}-${aws_instance.catalogue.id}"
-#     },
-#     local.common_tags
-#   )
-#   }
-#   tag_specifications {
-#     resource_type = "volume"
+    tags = merge(
+    {
+      Name = "${local.common_name}-${var.app_version}-${aws_instance.main.id}"
+    },
+    local.common_tags
+  )
+  }
+  tag_specifications {
+    resource_type = "volume"
 
-#     tags = merge(
-#     {
-#       Name = "${local.common_name}-catalogue-${var.app_version}-${aws_instance.catalogue.id}"
-#     },
-#     local.common_tags
-#   )
-#   }
-#   #launch template tags
-#   tags = merge(
-#     {
-#       Name = "${local.common_name}-catalogue-${var.app_version}-${aws_instance.catalogue.id}"
-#     },
-#     local.common_tags
-#   )
-# }
-# resource "aws_lb_target_group" "catalogue" {
-#   name     = "${local.common_name}-catalogue"
-#   port     = 80
-#   protocol = "HTTP"
-#   vpc_id   = local.vpc_id
-#   deregistration_delay = 30
-#   health_check {
-#     healthy_threshold = 2
-#     interval = 10
-#     matcher = "200-299"
-#     path = "/health"
-#     port = 8080
-#     protocol = "HTTP"
-#     timeout = 5
-#     unhealthy_threshold = 2
+    tags = merge(
+    {
+      Name = "${local.common_name}-${var.app_version}-${aws_instance.main.id}"
+    },
+    local.common_tags
+  )
+  }
+  #launch template tags
+  tags = merge(
+    {
+      Name = "${local.common_name}-${var.app_version}-${aws_instance.main.id}"
+    },
+    local.common_tags
+  )
+}
+resource "aws_lb_target_group" "main" {
+  name     = local.common_name
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = local.vpc_id
+  deregistration_delay = 30
+  health_check {
+    healthy_threshold = 2
+    interval = 10
+    matcher = "200-299"
+    path = "/health"
+    port = 8080
+    protocol = "HTTP"
+    timeout = 5
+    unhealthy_threshold = 2
     
-#   }
-# }
+  }
+}
 
 
 # resource "aws_autoscaling_group" "catalogue" {
