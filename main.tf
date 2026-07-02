@@ -33,11 +33,11 @@ resource "terraform_data" "main" {
     ]
   }
 }
-# resource "aws_ec2_instance_state" "catalogue" {
-#   instance_id = aws_instance.catalogue.id
-#   state       = "stopped"
-#   depends_on = [ terraform_data.catalogue ]
-# }
+resource "aws_ec2_instance_state" "main" {
+  instance_id = aws_instance.main.id
+  state       = "stopped"
+  depends_on = [ terraform_data.main]
+}
 # resource "aws_ami_from_instance" "catalogue" {
 #   name               = "${local.common_name}-catalogue-${var.app_version}-${aws_instance.catalogue.id}"
 #   source_instance_id = aws_instance.catalogue.id
